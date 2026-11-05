@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: dapurkita
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/dapurkita}
+    username: ${DB_USER:dapurkita}
+    password: ${DB_PASSWORD:dapurkita}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+  forward-headers-strategy: framework
+  error:
+    include-stacktrace: never
+    include-message: never
+
+app:
+  jwt:
+    # Wajib diisi lewat environment (minimal 32 karakter). Aplikasi gagal start jika kosong.
+    secret: ${JWT_SECRET}
+    issuer: dapurkita
+    access-ttl: 15m
+  refresh:
+    ttl: 7d
+  cookie:
+    secure: true
+  bcrypt-strength: 12
+  rate-limit:
+    enabled: true
+    login-per-minute: 10
+    register-per-minute: 5
+  admin:
+    email: ${ADMIN_EMAIL:}
+    password: ${ADMIN_PASSWORD:}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

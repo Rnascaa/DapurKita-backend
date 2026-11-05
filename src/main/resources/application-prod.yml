@@ -1,0 +1,6 @@
+# Profil production: semua rahasia datang dari environment variable.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

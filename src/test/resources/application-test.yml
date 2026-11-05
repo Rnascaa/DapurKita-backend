@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+app:
+  jwt:
+    secret: test-secret-test-secret-test-secret-0123456789
+  cookie:
+    secure: false
+  bcrypt-strength: 4
+  rate-limit:
+    enabled: false

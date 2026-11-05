@@ -1,0 +1,14 @@
+# PostgreSQL lokal untuk development: docker compose up -d
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: dapurkita
+      POSTGRES_USER: dapurkita
+      POSTGRES_PASSWORD: dapurkita
+    ports:
+      - "5432:5432"
+    volumes:
+      - dapurkita-pgdata:/var/lib/postgresql/data
+volumes:
+  dapurkita-pgdata:

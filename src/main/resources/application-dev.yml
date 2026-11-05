@@ -1,0 +1,11 @@
+# Profil development: jalankan dengan --spring.profiles.active=dev
+app:
+  jwt:
+    secret: dev-only-secret-change-me-0123456789abcdef
+  cookie:
+    secure: false
+  admin:
+    email: admin@dapurkita.local
+    password: Admin12345!
+  seed:
+    sample-recipes: true   # resep contoh hanya untuk dev; tabel resep harus kosong
