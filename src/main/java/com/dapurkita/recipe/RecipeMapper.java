@@ -7,17 +7,17 @@ public final class RecipeMapper {
     private RecipeMapper() {
     }
 
-    public static RecipeSummary toSummary(Recipe r, boolean favorited) {
+    public static RecipeSummary toSummary(Recipe r, boolean favorited, Rating rating) {
         return new RecipeSummary(r.getId(), r.getTitle(), r.getDescription(), r.getImageUrl(),
                 r.getCookingTimeMinutes(), r.getServings(), CategoryRef.from(r.getCategory()),
-                favorited, r.getCreatedAt());
+                favorited, rating.average(), rating.count(), r.getCreatedAt());
     }
 
     /** Harus dipanggil di dalam transaksi karena membaca koleksi lazy. */
-    public static RecipeDetail toDetail(Recipe r, boolean favorited) {
+    public static RecipeDetail toDetail(Recipe r, boolean favorited, Rating rating) {
         return new RecipeDetail(r.getId(), r.getTitle(), r.getDescription(), r.getImageUrl(),
                 r.getCookingTimeMinutes(), r.getServings(), CategoryRef.from(r.getCategory()),
-                favorited, r.getCreatedAt(),
+                favorited, rating.average(), rating.count(), r.getCreatedAt(),
                 r.getIngredients().stream()
                         .map(i -> new RecipeDetail.IngredientResponse(i.getName(), i.getQuantity(), i.getUnit()))
                         .toList(),

@@ -10,6 +10,7 @@ import com.dapurkita.user.User;
 import com.dapurkita.user.UserRepository;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,13 +25,15 @@ public class RecipeService {
     private final CategoryRepository categories;
     private final UserRepository users;
     private final FavoriteRepository favorites;
+    private final RatingLookup ratings;
 
     public RecipeService(RecipeRepository recipes, CategoryRepository categories, UserRepository users,
-                         FavoriteRepository favorites) {
+                         FavoriteRepository favorites, RatingLookup ratings) {
         this.recipes = recipes;
         this.categories = categories;
         this.users = users;
         this.favorites = favorites;
+        this.ratings = ratings;
     }
 
     @Transactional(readOnly = true)
@@ -38,16 +41,19 @@ public class RecipeService {
                                             ListParams params, Long userId) {
         Page<Recipe> page = recipes.findAll(RecipeSpecifications.build(q, categoryId, ingredients),
                 PageRequest.of(params.page() - 1, params.size(), sortFor(params.sort())));
-        Set<Long> favorited = favoritedIds(userId, page.getContent().stream().map(Recipe::getId).toList());
+        List<Long> ids = page.getContent().stream().map(Recipe::getId).toList();
+        Set<Long> favorited = favoritedIds(userId, ids);
+        Map<Long, Rating> rated = ratings.forRecipes(ids);
         return PageResponse.of(page, page.getContent().stream()
-                .map(r -> RecipeMapper.toSummary(r, favorited.contains(r.getId())))
+                .map(r -> RecipeMapper.toSummary(r, favorited.contains(r.getId()),
+                        rated.getOrDefault(r.getId(), Rating.NONE)))
                 .toList());
     }
 
     @Transactional(readOnly = true)
     public RecipeDetail get(Long id, Long userId) {
         Recipe recipe = load(id);
-        return RecipeMapper.toDetail(recipe, !favoritedIds(userId, List.of(id)).isEmpty());
+        return RecipeMapper.toDetail(recipe, !favoritedIds(userId, List.of(id)).isEmpty(), ratings.forRecipe(id));
     }
 
     @Transactional
@@ -57,14 +63,14 @@ public class RecipeService {
         Recipe recipe = new Recipe(author, category);
         recipe.replaceContent(category, request);
         recipes.save(recipe);
-        return RecipeMapper.toDetail(recipe, false);
+        return RecipeMapper.toDetail(recipe, false, Rating.NONE);
     }
 
     @Transactional
     public RecipeDetail update(Long id, RecipeRequest request, Long adminId) {
         Recipe recipe = load(id);
         recipe.replaceContent(loadCategory(request.categoryId()), request);
-        return RecipeMapper.toDetail(recipe, !favoritedIds(adminId, List.of(id)).isEmpty());
+        return RecipeMapper.toDetail(recipe, !favoritedIds(adminId, List.of(id)).isEmpty(), ratings.forRecipe(id));
     }
 
     @Transactional

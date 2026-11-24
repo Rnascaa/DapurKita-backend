@@ -10,3 +10,5 @@ app:
   bcrypt-strength: 4
   rate-limit:
     enabled: false
+  images:
+    dir: target/test-images

@@ -1,7 +1,7 @@
 # DapurKita Backend
 
 REST API untuk pencarian dan pengelolaan resep masakan Indonesia.
-Java 21, Spring Boot 3.5, PostgreSQL 16, Flyway. Kontrak: **API v2.3.1** (`openapi.yaml`, base path `/api/v1`).
+Java 21, Spring Boot 3.5, PostgreSQL 16, Flyway. Kontrak: **API v2.4.0** (`openapi.yaml`, base path `/api/v1`).
 
 ## Menjalankan (lokal)
 
@@ -28,7 +28,10 @@ Untuk mengosongkan database dev (semua data dev terhapus): `docker compose down 
 ## Produksi
 
 Set environment variable (lihat `.env.example`): `DB_URL`, `DB_USER`, `DB_PASSWORD`,
-`JWT_SECRET` (wajib, tidak ada default), `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
+`JWT_SECRET` (wajib, tidak ada default), `ADMIN_EMAIL`, `ADMIN_PASSWORD`, dan `IMAGES_DIR`
+(folder foto hasil upload admin, default `data/images`). Di Docker, mount `IMAGES_DIR` sebagai volume
+agar foto tidak hilang saat redeploy, dan izinkan body request sampai 6 MB di reverse proxy
+(foto maksimal 5 MB).
 Jalankan dengan `--spring.profiles.active=prod` (Swagger dimatikan, cookie `Secure`).
 Layani frontend dan API dari origin yang sama lewat reverse proxy, karena refresh token
 adalah cookie `SameSite=Strict` dengan `Path=/api/v1/auth`.
@@ -44,8 +47,14 @@ TOKEN_EXPIRED vs UNAUTHORIZED, akses ADMIN (401/403/201), validasi bersarang `in
 `categoryId` tidak ada, pencarian (`q`, `categoryId`, `ingredient` berulang sebagai AND), pagination
 dan sort, page/size/sort di luar batas (400), PUT mengganti seluruh isi, DELETE lalu 404, serta favorit idempoten.
 
+`CommunityApiIntegrationTest` (v2.4) mencakup: ulasan satu per user dan rata-rata rating di daftar/detail resep,
+ulasan unggulan, moderasi ADMIN, komentar dengan satu tingkat balasan dan aturan hapus (pemilik/ADMIN),
+hapus resep ikut menghapus komentar dan ulasan, artikel (hanya ADMIN, tag dinormalkan, filter `q`/`category`/`tag`,
+faset, artikel sebelum/sesudah, PUT mempertahankan `publishedAt`), serta upload foto (cek isi file, bukan nama).
+
 ## Struktur
 
 Package-by-feature di `com.dapurkita`: `auth`, `user`, `category`, `recipe`, `favorite`,
+`comment`, `review`, `article`, `image`,
 `security`, `config`, `common`. Skema ada di `src/main/resources/db/migration` (Flyway);
 Hibernate hanya memvalidasi (`ddl-auto=validate`).

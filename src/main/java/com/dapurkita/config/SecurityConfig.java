@@ -49,13 +49,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
                                 "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories", "/api/v1/recipes",
-                                "/api/v1/recipes/*").permitAll()
+                                "/api/v1/recipes/*", "/api/v1/recipes/*/comments", "/api/v1/recipes/*/reviews",
+                                "/api/v1/reviews/featured", "/api/v1/articles", "/api/v1/articles/facets",
+                                "/api/v1/articles/*", "/api/v1/images/*").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/error")
                         .permitAll()
                         // Hanya ADMIN yang mengelola resep. Dicek di backend, bukan hanya di UI.
                         .requestMatchers(HttpMethod.POST, "/api/v1/recipes").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/recipes/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/recipes/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/articles", "/api/v1/images").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/articles/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/articles/*", "/api/v1/reviews/*").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(converter))

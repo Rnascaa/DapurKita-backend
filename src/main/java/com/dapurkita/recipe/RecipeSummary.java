@@ -14,5 +14,7 @@ public record RecipeSummary(
         int servings,
         CategoryRef category,
         @JsonProperty("isFavorited") boolean isFavorited,
+        Double ratingAverage,
+        long ratingCount,
         Instant createdAt) {
 }

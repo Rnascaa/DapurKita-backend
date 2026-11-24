@@ -11,7 +11,8 @@ public record AppProperties(
         Cookie cookie,
         @DefaultValue("12") int bcryptStrength,
         @DefaultValue RateLimit rateLimit,
-        @DefaultValue Admin admin) {
+        @DefaultValue Admin admin,
+        @DefaultValue Images images) {
 
     public record Jwt(String secret, @DefaultValue("dapurkita") String issuer,
                       @DefaultValue("15m") Duration accessTtl) {
@@ -25,9 +26,14 @@ public record AppProperties(
 
     public record RateLimit(@DefaultValue("true") boolean enabled,
                             @DefaultValue("10") int loginPerMinute,
-                            @DefaultValue("5") int registerPerMinute) {
+                            @DefaultValue("5") int registerPerMinute,
+                            @DefaultValue("20") int communityPerMinute) {
     }
 
     public record Admin(String email, String password) {
+    }
+
+    /** Folder foto hasil upload. Di produksi arahkan ke volume yang persisten. */
+    public record Images(@DefaultValue("data/images") String dir) {
     }
 }

@@ -17,6 +17,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
@@ -56,6 +58,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({HttpMessageNotReadableException.class, HttpMediaTypeNotSupportedException.class,
             HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<ErrorResponse> handleMalformed(Exception ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.MALFORMED_REQUEST, "Permintaan tidak valid", null, request);
+    }
+
+    /** Upload melebihi spring.servlet.multipart.max-file-size. */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleTooLarge(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        List<FieldErrorItem> errors = List.of(new FieldErrorItem("file", "Ukuran foto maksimal 5 MB"));
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR, "Data tidak valid", errors, request);
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ErrorResponse> handleMultipart(MultipartException ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, ErrorCode.MALFORMED_REQUEST, "Permintaan tidak valid", null, request);
     }
 

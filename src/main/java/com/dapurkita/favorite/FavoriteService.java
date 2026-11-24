@@ -3,9 +3,12 @@ package com.dapurkita.favorite;
 import com.dapurkita.common.dto.PageResponse;
 import com.dapurkita.common.exception.ApiException;
 import com.dapurkita.common.web.ListParams;
+import com.dapurkita.recipe.Rating;
+import com.dapurkita.recipe.RatingLookup;
 import com.dapurkita.recipe.RecipeMapper;
 import com.dapurkita.recipe.RecipeRepository;
 import com.dapurkita.recipe.RecipeSummary;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,10 +20,12 @@ public class FavoriteService {
 
     private final FavoriteRepository favorites;
     private final RecipeRepository recipes;
+    private final RatingLookup ratings;
 
-    public FavoriteService(FavoriteRepository favorites, RecipeRepository recipes) {
+    public FavoriteService(FavoriteRepository favorites, RecipeRepository recipes, RatingLookup ratings) {
         this.favorites = favorites;
         this.recipes = recipes;
+        this.ratings = ratings;
     }
 
     @Transactional
@@ -44,8 +49,11 @@ public class FavoriteService {
             default -> Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id.recipeId"));
         };
         Page<Favorite> page = favorites.findPage(userId, PageRequest.of(params.page() - 1, params.size(), sort));
+        Map<Long, Rating> rated = ratings.forRecipes(
+                page.getContent().stream().map(f -> f.getId().getRecipeId()).toList());
         return PageResponse.of(page, page.getContent().stream()
-                .map(f -> RecipeMapper.toSummary(f.getRecipe(), true))
+                .map(f -> RecipeMapper.toSummary(f.getRecipe(), true,
+                        rated.getOrDefault(f.getId().getRecipeId(), Rating.NONE)))
                 .toList());
     }
 

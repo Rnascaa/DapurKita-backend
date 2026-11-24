@@ -11,4 +11,9 @@ public final class CurrentUser {
     public static Long idOrNull(Jwt jwt) {
         return jwt == null ? null : Long.valueOf(jwt.getSubject());
     }
+
+    /** Peran dibaca dari klaim "role" token yang sudah diverifikasi. */
+    public static boolean isAdmin(Jwt jwt) {
+        return jwt != null && "ADMIN".equals(jwt.getClaimAsString("role"));
+    }
 }

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import com.dapurkita.common.web.ImageUrls;
 import java.util.List;
 
 /** Body POST dan PUT /recipes. Urutan bahan dan langkah mengikuti urutan array. */
@@ -18,7 +19,7 @@ public record RecipeRequest(
         String description,
 
         @Size(max = 2048, message = "URL gambar maksimal 2048 karakter")
-        @Pattern(regexp = "^(?i)https?://\\S+$", message = "URL gambar harus berawalan http atau https")
+        @Pattern(regexp = ImageUrls.PATTERN, message = ImageUrls.MESSAGE)
         String imageUrl,
 
         @NotNull(message = "Waktu memasak wajib diisi")
