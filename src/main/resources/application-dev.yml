@@ -1,11 +1,11 @@
-# Profil development: jalankan dengan --spring.profiles.active=dev
+# Profil development: jalankan dengan --spring.profiles.active=dev dari folder repo ini.
+# Rahasia lokal (DB_PASSWORD, JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD) dibaca dari file .env
+# yang tidak di-commit. Salin .env.example menjadi .env lalu isi nilainya.
+spring:
+  config:
+    import: optional:file:.env[.properties]
 app:
-  jwt:
-    secret: dev-only-secret-change-me-0123456789abcdef
   cookie:
     secure: false
-  admin:
-    email: admin@dapurkita.local
-    password: Admin12345!
   seed:
     sample-recipes: true   # resep contoh hanya untuk dev; tabel resep harus kosong

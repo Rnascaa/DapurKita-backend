@@ -7,15 +7,18 @@ Java 21, Spring Boot 3.5, PostgreSQL 16, Flyway. Kontrak: **API v2.4.0** (`opena
 
 Prasyarat: JDK 21, Maven 3.9+, Docker.
 
+Salin `.env.example` menjadi `.env`, lalu isi `DB_PASSWORD`, `JWT_SECRET`, `ADMIN_EMAIL`, dan `ADMIN_PASSWORD`
+dengan nilai Anda sendiri. File `.env` tidak di-commit; isinya dibaca oleh `docker compose` dan oleh profil `dev`.
+
 ```bash
-docker compose up -d                       # PostgreSQL 16 (db/user/password: dapurkita)
+docker compose up -d                       # PostgreSQL 16 (db/user: dapurkita, password dari .env)
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 Di PowerShell, beri tanda kutip pada argumen Maven: `mvn spring-boot:run "-Dspring-boot.run.profiles=dev"`.
 
-Profil `dev` memakai JWT secret dev, cookie tanpa `Secure`, dan membuat admin
-`admin@dapurkita.local` / `Admin12345!`. Jangan dipakai di produksi.
+Profil `dev` memakai cookie tanpa `Secure` dan membuat akun admin dari `ADMIN_EMAIL`/`ADMIN_PASSWORD` di `.env`.
+Jangan dipakai di produksi.
 
 Profil `dev` juga mengisi **16 resep contoh** lewat `SampleRecipeSeeder`, hanya jika tabel resep kosong
 (`app.seed.sample-recipes=true`). Semua `imageUrl` contoh bernilai `null`.

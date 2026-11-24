@@ -57,6 +57,9 @@ class CommunityApiIntegrationTest {
 
     private static final byte[] PNG = {(byte) 0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13, 'I', 'H', 'D', 'R'};
 
+    /** Dibuat acak setiap kali tes berjalan; tidak ada kata sandi tetap di repo. */
+    private static final String ADMIN_PASSWORD = UUID.randomUUID().toString();
+
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @Autowired UserRepository users;
@@ -86,9 +89,9 @@ class CommunityApiIntegrationTest {
 
     private String adminToken() throws Exception {
         String email = "admin-" + suffix() + "@dapurkita.test";
-        users.save(new User("Admin Dapur", email, encoder.encode("Admin12345!"), Role.ADMIN));
+        users.save(new User("Admin Dapur", email, encoder.encode(ADMIN_PASSWORD), Role.ADMIN));
         MvcResult login = mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("email", email, "password", "Admin12345!"))))
+                        .content(json(Map.of("email", email, "password", ADMIN_PASSWORD))))
                 .andExpect(status().isOk()).andReturn();
         return body(login).get("accessToken").asText();
     }

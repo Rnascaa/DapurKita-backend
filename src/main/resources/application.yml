@@ -4,7 +4,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/dapurkita}
     username: ${DB_USER:dapurkita}
-    password: ${DB_PASSWORD:dapurkita}
+    password: ${DB_PASSWORD:}
   jpa:
     open-in-view: false
     hibernate:

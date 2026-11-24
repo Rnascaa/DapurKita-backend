@@ -62,6 +62,9 @@ class ApiIntegrationTest {
     @ServiceConnection
     static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:16");
 
+    /** Dibuat acak setiap kali tes berjalan; tidak ada kata sandi tetap di repo. */
+    private static final String ADMIN_PASSWORD = UUID.randomUUID().toString();
+
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @Autowired UserRepository users;
@@ -94,9 +97,9 @@ class ApiIntegrationTest {
 
     private String adminToken() throws Exception {
         String email = "admin-" + UUID.randomUUID().toString().substring(0, 8) + "@dapurkita.test";
-        users.save(new User("Admin", email, encoder.encode("Admin12345!"), Role.ADMIN));
+        users.save(new User("Admin", email, encoder.encode(ADMIN_PASSWORD), Role.ADMIN));
         MvcResult login = mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("email", email, "password", "Admin12345!"))))
+                        .content(json(Map.of("email", email, "password", ADMIN_PASSWORD))))
                 .andExpect(status().isOk()).andReturn();
         return body(login).get("accessToken").asText();
     }
